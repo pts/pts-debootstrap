@@ -32,13 +32,13 @@ Usage for creating a chroot with the oldest supported Debian (potato, Debian 2.2
 
   $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap potato potato_dir
   ...
-  $ sudo chroot potato_dir
+  $ sudo pts-debootstrap/bin/chroot potato_dir
 
 Usage for creating a chroot with the oldest supported Ubuntu (feisty, Ubuntu 7.04, released on
 2007-04-19), i386:
 
   $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap feisty feisty_dir
   ...
-  $ sudo chroot feisty_dir
+  $ sudo pts-debootstrap/bin/chroot feisty_dir
 
 __END__
