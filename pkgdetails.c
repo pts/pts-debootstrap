@@ -1,3 +1,5 @@
+/* Compilation: xstatic gcc -D_GNU_SOURCE -s -Os -W -Wall -Wextra -o pkgdetails pkgdetails.c */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
