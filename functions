@@ -1495,7 +1495,9 @@ read_gpg_status () {
 	elif [ "$unkkey" ]; then
 		error 1 UNKNOWNRELSIG "Release signed by unknown key (key id %s)" "$unkkey"
 	else
-		error 1 SIGCHECK "Error executing gpgv to check Release signature"
+		if in_path gpgv; then  #### pts ####
+			error 1 SIGCHECK "Error executing gpgv to check Release signature"
+		fi
 	fi
 }
 

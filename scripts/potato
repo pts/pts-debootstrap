@@ -101,4 +101,6 @@ second_stage_install () {
     smallyes '' | repeatn 5 in_target dpkg --force-auto-select --force-overwrite --skip-same-version --install $(debfor $base)
 
     mv "$TARGET/sbin/start-stop-daemon.REAL" "$TARGET/sbin/start-stop-daemon"
+
+    info BASESUCCESS "Base system installed successfully."  #### pts ####
 }
