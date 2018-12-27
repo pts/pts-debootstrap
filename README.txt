@@ -41,4 +41,10 @@ Usage for creating a chroot with the oldest supported Ubuntu (feisty, Ubuntu 7.0
   ...
   $ sudo pts-debootstrap/bin/chroot feisty_dir
 
+To start intalling packages, run `apt-get update' in the chroot first.
+Example:
+
+  $ sudo pts-debootstrap/bin/chroot feisty_dir apt-get update
+  $ sudo pts-debootstrap/bin/chroot feisty_dir apt-get install gcc
+
 __END__
