@@ -1,6 +1,6 @@
-default_mirror http://old-releases.ubuntu.com/ubuntu
 mirror_style release
 download_style apt
+force_md5
 finddebs_style from-indices
 variants - buildd
 
