@@ -1,13 +1,6 @@
-case $ARCH in
-  amd64|i386|powerpc|sparc)
-    default_mirror http://archive.ubuntu.com/ubuntu
-    ;;
-  *)
-    default_mirror http://ports.ubuntu.com/ubuntu-ports
-    ;;
-esac
 mirror_style release
 download_style apt
+force_md5
 finddebs_style from-indices
 variants - buildd
 
