@@ -27,24 +27,24 @@ Installation to any directory, as a regular user:
   $ ./pts-debootstrap-latest.sfx.7z -y  # Created directory pts-debootstrap
   $ pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap --help
 
-Usage for creating a chroot with the oldest supported Debian (potato, Debian 2.2, released on
-2000-08-15), i386:
+Usage for creating a chroot with the oldest supported Debian (potato,
+Debian 2.2, released on 2000-08-15), i386:
 
   $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap potato potato_dir
   ...
   $ sudo pts-debootstrap/bin/chroot potato_dir
 
-Usage for creating a chroot with the oldest supported Ubuntu (feisty, Ubuntu 7.04, released on
-2007-04-19), i386:
+Usage for creating a chroot with the oldest supported Ubuntu (breezy,
+Ubuntu 5.10, released on 2005-10-12), i386:
 
-  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap feisty feisty_dir
+  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap breezy breezy_dir
   ...
-  $ sudo pts-debootstrap/bin/chroot feisty_dir
+  $ sudo pts-debootstrap/bin/chroot breezy_dir
 
 To start intalling packages, run `apt-get update' in the chroot first.
 Example:
 
-  $ sudo pts-debootstrap/bin/chroot feisty_dir apt-get update
-  $ sudo pts-debootstrap/bin/chroot feisty_dir apt-get install gcc
+  $ sudo pts-debootstrap/bin/chroot breezy_dir apt-get update
+  $ sudo pts-debootstrap/bin/chroot breezy_dir apt-get install gcc
 
 __END__
