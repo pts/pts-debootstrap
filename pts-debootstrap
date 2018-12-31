@@ -591,7 +591,7 @@ fi
 . "$SCRIPT"
 
 #### pts ####
-for TSUITE in etch lenny potato sarge sarge.buildd sarge.fakechroot squeeze woody; do
+for TSUITE in etch lenny potato sarge sarge.buildd sarge.fakechroot squeeze woody slink; do
   if test "$SUITE" = "$TSUITE"; then
     # As of 2017-07-18, these suites are archived.
     DEF_MIRROR="http://archive.debian.org/debian/"

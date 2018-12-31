@@ -27,12 +27,12 @@ Installation to any directory, as a regular user:
   $ ./pts-debootstrap-latest.sfx.7z -y  # Created directory pts-debootstrap
   $ pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap --help
 
-Usage for creating a chroot with the oldest supported Debian (potato,
-Debian 2.2, released on 2000-08-15), i386:
+Usage for creating a chroot with the oldest supported Debian (slink,
+Debian 2.1, released on 1999-03-09), i386:
 
-  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap potato potato_dir
+  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap slink slink_dir
   ...
-  $ sudo pts-debootstrap/bin/chroot potato_dir
+  $ sudo pts-debootstrap/bin/chroot slink_dir
 
 Usage for creating a chroot with the oldest supported Ubuntu (breezy,
 Ubuntu 5.10, released on 2005-10-12), i386:
