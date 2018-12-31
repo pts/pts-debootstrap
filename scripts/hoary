@@ -1,6 +1,18 @@
-default_mirror http://old-releases.ubuntu.com/ubuntu
+# This fails on 2018-12-31, the error message is:
+#
+#   W: Failure trying to run: env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ./bin/chroot /home/pts/prg/pts-debootstrap/hoary_dir mount -t proc proc /proc
+#   W: See /home/pts/prg/pts-debootstrap/hoary_dir/debootstrap/debootstrap.log for details
+#   ...
+#   Inconsistency detected by ld.so: rtld.c: 1192: dl_main: Assertion `(void *) ph->p_vaddr == _rtld_local._dl_sysinfo_dso' failed!
+#
+# This is caused by libc6 (glibc) 2.3.2 incompatible with modern Linux
+# kernels (e.g. 4.18). Disabling the vdso could solve the, but it doesn't
+# seem to be possible without a reboot with vdso=off.
+#
+
 mirror_style release
 download_style apt
+force_md5
 
 case $ARCH in
   ia64)       LIBC="libc6.1" ;;
