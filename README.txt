@@ -1,9 +1,9 @@
 pts-debootstrap: portable debootstrap for i386 and amd64
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pts-debootstrap is set of portable tools for creating chroot environments
-for Debian and Ubuntu Linux distributions. pts-debootstrap is based on
-Debian's debootstrap tool, and it adds portability (it runs on any Linux i386
-or amd64 system, and it doesn't need any package installation), and it
+for Debian, Ubuntu and Tanglu Linux distributions. pts-debootstrap is based
+on Debian's debootstrap tool, and it adds portability (it runs on any Linux
+i386 or amd64 system, and it doesn't need any package installation), and it
 improves compatibility with older Debian and Ubuntu releases.
 
 Features of pts-debootstrap:
@@ -66,5 +66,12 @@ Running debootstrap or pts-debootstrap for a distribution with a glibc
 incompatible with the vdso typically reports the following error on stderr:
 
   W: Failure trying to run: env PATH=/usr/... .../chroot /... mount -t proc proc /proc
+
+The following releases of Tanglu Linux are supported:
+
+* aequorea (Tanglu 1.0, 2014-04-22)
+* bartholomea (Tanglu 2.0, 2014-12-13)
+* chromodoris (Tanglu 3.0, 2015-08-05)
+* dasyatis (Tanglu 4.0, 2017-06-11)
 
 __END__
