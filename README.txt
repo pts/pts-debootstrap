@@ -34,6 +34,10 @@ Debian 2.1, released on 1999-03-09), i386:
   ...
   $ sudo pts-debootstrap/bin/chroot slink_dir
 
+Please note that in slink (Debian 2.1) and potato (Debian 2.2), UIDs larger
+than 65535 are not supported by the glibc. The oldest Debian which works
+with UIDs larger than 65535 is woody (Debian 3.0).
+
 Earlier versions of Debian (such as hamm, Debian 2.0 and bo, Debian 1.3 and
 rex, Debian 1.2 and Buzz, Debian 1.1) don't work, because a debootstrap
 install script has never been written for them.
