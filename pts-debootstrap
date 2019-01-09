@@ -58,7 +58,7 @@ set -e
 . $DEBOOTSTRAP_DIR/functions
 exec 4>&1
 
-LANG=C
+export LANG=C LANGUAGE=C LC_ALL=C
 USE_COMPONENTS=main
 KEYRING=""
 DISABLE_KEYRING=""
