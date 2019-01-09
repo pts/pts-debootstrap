@@ -6,6 +6,8 @@ smallyes() {
 }
 
 in_path () {
+	# Works for busybox sh, not bash.
+	test "$(type "$1")" = "$1 is a shell function" && return 0
 	local OLD_IFS="$IFS"
 	IFS=":"
 	for dir in $PATH; do
@@ -260,21 +262,9 @@ verify_checksum () {
 	local expchecksum="$2"
 	local expsize="$3"
 	if [ "$DEBOOTSTRAP_CHECKSUM_FIELD" = "MD5SUM" ]; then
-		if in_path md5sum; then
-			relchecksum=`md5sum < "$1" | sed 's/ .*$//'`
-		elif in_path md5; then
-			relchecksum=`md5 < "$1"`
-		else
-			error 1 SIGCHECK "Cannot check md5sum"
-		fi
+		relchecksum=`md5sum < "$1" | sed 's/ .*$//'`
 	else
-		if in_path "sha${SHA_SIZE}sum"; then
-			relchecksum=`sha${SHA_SIZE}sum < "$1" | sed 's/ .*$//'`
-		elif in_path "sha${SHA_SIZE}"; then
-			relchecksum=`sha${SHA_SIZE} < "$1"`
-		else
-			error 1 SIGCHECK "Cannot check sha${SHA_SIZE}sum"
-		fi
+		relchecksum=`sha${SHA_SIZE}sum < "$1" | sed 's/ .*$//'`
 	fi
 	relsize=`wc -c < "$1"`
 	if [ "$expsize" -ne "$relsize" ] || [ "$expchecksum" != "$relchecksum" ]; then
@@ -626,11 +616,11 @@ download_release_indices () {
 		local i=
 		if [ "$normi" != "" ]; then
 			i="$normi"
-		elif in_path bunzip2 && [ "$bz2i" != "" ]; then
+		elif [ "$bz2i" != "" ]; then
 			i="$bz2i"
-		elif in_path unxz && [ "$xzi" != "" ]; then
+		elif [ "$xzi" != "" ]; then
 			i="$xzi"
-		elif in_path gunzip && [ "$gzi" != "" ]; then
+		elif [ "$gzi" != "" ]; then
 			i="$gzi"
 		fi
 		if [ "$i" != "" ]; then
@@ -657,15 +647,15 @@ download_release_indices () {
 			ext="$ext $normi ."
 			i="$normi"
 		fi
-		if in_path unxz && [ "$xzi" != "" ]; then
+		if [ "$xzi" != "" ]; then
 			ext="$ext $xzi xz"
 			i="${i:-$xzi}"
 		fi
-		if in_path bunzip2 && [ "$bz2i" != "" ]; then
+		if [ "$bz2i" != "" ]; then
 			ext="$ext $bz2i bz2"
 			i="${i:-$bz2i}"
 		fi
-		if in_path gunzip && [ "$gzi" != "" ]; then
+		if [ "$gzi" != "" ]; then
 			ext="$ext $gzi gz"
 			i="${i:-$gzi}"
 		fi
@@ -806,7 +796,7 @@ download_main_indices () {
 	    for c in $COMPONENTS; do
 		local path="dists/$SUITE/$c/binary-$ARCH/Packages"
 		local pkgdest="$TARGET/$($DLDEST pkg "$SUITE" "$c" "$ARCH" "$m" "$path")"
-		if in_path gunzip && get "$m/${path}.gz" "${pkgdest}.gz"; then
+		if get "$m/${path}.gz" "${pkgdest}.gz"; then
 			rm -f "$pkgdest"
 			gunzip "$pkgdest.gz"
 		elif get "$m/$path" "$pkgdest"; then
@@ -1309,7 +1299,7 @@ read_gpg_status () {
 	elif [ "$unkkey" ]; then
 		error 1 UNKNOWNRELSIG "Release signed by unknown key (key id %s)" "$unkkey"
 	else
-		if in_path gpgv; then  #### pts ####
+		if in_path gpgv; then  #### pts #### TODO(pts): Remove this feature, we don't have gpgv.
 			error 1 SIGCHECK "Error executing gpgv to check Release signature"
 		fi
 	fi

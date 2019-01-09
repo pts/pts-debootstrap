@@ -447,79 +447,31 @@ fi
 
 ###########################################################################
 
-if in_path dpkg && \
-     dpkg --print-architecture >/dev/null 2>&1; then
-	HOST_ARCH=`/usr/bin/dpkg --print-architecture`
-elif in_path udpkg && \
-     udpkg --print-architecture >/dev/null 2>&1; then
-	HOST_ARCH=`/usr/bin/udpkg --print-architecture`
-elif [ -e $DEBOOTSTRAP_DIR/arch ]; then
-	HOST_ARCH=`cat $DEBOOTSTRAP_DIR/arch`
-fi
-HOST_OS="$HOST_ARCH"
-# basic host OS guessing for non-Debian systems
-if [ -z "$HOST_OS" ]; then
-	case `uname` in
-		Linux)
-			HOST_OS=linux
-		;;
-		GNU/kFreeBSD)
-			HOST_OS=kfreebsd
-		;;
-		GNU)
-			HOST_OS=hurd
-		;;
-		FreeBSD*)
-			HOST_OS=freebsd
-		;;
-	esac
-fi
-
-if [ -z "$ARCH" ]; then
-	ARCH=$HOST_ARCH
-fi
-
-if [ -z "$ARCH" ] || [ -z "$HOST_OS" ]; then
-        error 1 WHATARCH "Couldn't work out current architecture"
-
-fi
-
-if [ "$HOST_OS" = "kfreebsd" ] || [ "$HOST_OS" = "freebsd" ]; then
-	for module in linprocfs fdescfs tmpfs linsysfs; do
-		kldstat -m "$module" > /dev/null 2>&1 || warning SANITYCHECK "Probably required module %s is not loaded" "$module"
-	done
-fi
+# TODO(pts): Better detect FreeBSD modules.
+#	for module in linprocfs fdescfs tmpfs linsysfs; do
+#		kldstat -m "$module" > /dev/null 2>&1 || warning SANITYCHECK "Probably required module %s is not loaded" "$module"
+#	done
 
 #### pts ####
-if [ "$TARGET" = "/" ]; then
-	CHROOT_CMD="env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin "
-else
-	CHROOT_CMD="env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $DEBOOTSTRAP_DIR/bin/chroot $TARGET"
-fi
-C=0
-for F in $TARGET; do
-  let C=C+1
-done
-test "$C" = 1 || error 1 TARGETONE "Target '$TARGET' contains whitespace"
-C=0
-for F in $DEBOOTSTRAP_DIR; do
-  let C=C+1
-done
-test "$C" = 1 || error 1 DBDIRONE "Debootstrap directory '$DEBOOTSTRAP_DIR' contains whitespace"
-
+debootstrap_chroot () {
+  local CPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  if [ "$TARGET" = "/" ]; then
+    PATH="$CPATH" "$@"
+  else
+    PATH="$CPATH" chroot "$TARGET" "$@"
+  fi
+}
+CHROOT_CMD=debootstrap_chroot
 
 if [ -z "$SHA_SIZE" ]; then
 	SHA_SIZE=256
-fi
-if ! in_path "sha${SHA_SIZE}sum" && ! in_path "sha${SHA_SIZE}"; then
-	SHA_SIZE=1
 fi
 DEBOOTSTRAP_CHECKSUM_FIELD="SHA$SHA_SIZE"
 
 export ARCH SUITE TARGET CHROOT_CMD SHA_SIZE DEBOOTSTRAP_CHECKSUM_FIELD
 
 if am_doing_phase first_stage second_stage; then
-	if in_path id && [ `id -u` -ne 0 ]; then
+	if [ `id -u` -ne 0 ]; then
 		error 1 NEEDROOT "debootstrap can only run as root"
 	fi
 	# Ensure that we can create working devices and executables on the target.
