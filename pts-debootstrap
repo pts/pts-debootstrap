@@ -27,8 +27,9 @@ done
 DEBOOTSTRAP_AR="$DEBOOTSTRAP_DIR/miniar"
 PKGDETAILS="$DEBOOTSTRAP_DIR/pkgdetails"
 
+# Shell builtings: true, false, pwd, printf.
 for F in bunzip2 bzcat cat chmod chown chroot cp cut env grep gunzip \
-    head id ln md5sum mkdir mknod mount mv printf readlink rm rmdir \
+    head id ln md5sum mkdir mknod mount mv readlink rm rmdir \
     sed sh sleep sort sync tar touch tr umount uname uniq unxz wc \
     wget xzcat yes zcat sha1sum sha256sum sha512sum; do
   eval "$F () { \"\$DEBOOTSTRAP_DIR/busybox\" $F \"\$@\"; }"
