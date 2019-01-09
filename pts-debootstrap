@@ -535,6 +535,45 @@ if am_doing_phase first_stage second_stage; then
 	fi
 fi
 
+###########################################################################
+
+# Set $DEF0_MIRROR by trying various distributions.
+if test "$USER_MIRROR"; then
+  DEF0_MIRROR="$USER_MIRROR"
+else
+  DEF0_MIRROR=
+  for TRY_MIRROR in \
+      http://archive.debian.org/debian/ \
+      http://archive.ubuntu.com/ubuntu/ \
+      http://old-releases.ubuntu.com/ubuntu/ \
+      http://ports.ubuntu.com/ubuntu-ports/ \
+      http://archive.tanglu.org/tanglu/ \
+  ; do
+    GOT="$(wget -q -O - "${TRY_MIRROR}dists/$SUITE/main/binary-$ARCH/Release" 2>/dev/null | grep '^Architecture: ' ||:)"
+    if [ "$GOT" ]; then
+      DEF0_MIRROR="$TRY_MIRROR"
+      break
+    fi
+  done
+  unset TRY_MIRROR GOT
+  #echo "SCRIPT=$SCRIPT" >&4
+  #echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
+fi
+info DEF0MIRROR "Using mirror: $DEF0_MIRROR"
+
+if [ ! -e "$SCRIPT" ]; then
+	if [ "${DEF0_MIRROR%/ubuntu*/}" != "$DEF0_MIRROR" ]; then
+		SCRIPT="${SCRIPT%/*}/gutsy"
+	elif [ "${DEF0_MIRROR%/tanglu*/}" != "$DEF0_MIRROR" ]; then
+		SCRIPT="${SCRIPT%/*}/aequorea"
+	elif [ "${DEF0_MIRROR%/debian*/}" != "$DEF0_MIRROR" ]; then
+		SCRIPT="${SCRIPT%/*}/sid"
+	else
+		warning UNKNOWNDIST "Unknown Linux distribution based on mirror URL: $DEF0_MIRROR"
+	fi
+fi
+#echo "SCRIPT=$SCRIPT" >&4
+#echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
 if [ ! -e "$SCRIPT" ]; then
 	error 1 NOSCRIPT "No such script: %s" "$SCRIPT"
 fi
@@ -589,23 +628,9 @@ fi
 ###########################################################################
 
 . "$SCRIPT"
-
-#### pts ####
-for TSUITE in etch lenny potato sarge sarge.buildd sarge.fakechroot squeeze woody slink; do
-  if test "$SUITE" = "$TSUITE"; then
-    # As of 2017-07-18, these suites are archived.
-    DEF_MIRROR="http://archive.debian.org/debian/"
-    break
-  fi
-done
-for TSUITE in breezy dapper edgy feisty gutsy hardy hoary intrepid jaunty karmic lucid maverick natty oneiric precise quantal raring saucy utopic vivid warty wily yakkety zesty; do
-  if test "$SUITE" = "$TSUITE"; then
-    # As of 2017-07-18, these suites are archived here.
-    DEF_MIRROR="http://old-releases.ubuntu.com/ubuntu/"
-    break
-  fi
-done
-DEF_HTTPS_MIRROR="https://${DEF_MIRROR#*://}"
+DEF_MIRROR="$DEF0_MIRROR"
+DEF_HTTPS_MIRROR="https://${DEF0_MIRROR#*://}"
+unset DEF0_MIRROR
 
 if [ "$SECOND_STAGE_ONLY" = "true" ]; then
 	MIRRORS=null:
