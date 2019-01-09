@@ -83,9 +83,6 @@ CERTIFICATE=""
 CHECKCERTIF=""
 PRIVATEKEY=""
 
-#### pts ####
-DEF_MIRROR="http://deb.debian.org/debian"
-
 export LANG USE_COMPONENTS
 umask 022
 
@@ -545,13 +542,13 @@ if test "$USER_MIRROR"; then
 else
   DEF0_MIRROR=
   for TRY_MIRROR in \
-      http://archive.debian.org/debian/ \
-      http://archive.ubuntu.com/ubuntu/ \
-      http://old-releases.ubuntu.com/ubuntu/ \
-      http://ports.ubuntu.com/ubuntu-ports/ \
-      http://archive.tanglu.org/tanglu/ \
+      http://archive.debian.org/debian \
+      http://archive.ubuntu.com/ubuntu \
+      http://old-releases.ubuntu.com/ubuntu \
+      http://ports.ubuntu.com/ubuntu-ports \
+      http://archive.tanglu.org/tanglu \
   ; do
-    GOT="$(wget -q -O - "${TRY_MIRROR}dists/$SUITE/main/binary-$ARCH/Release" 2>/dev/null | grep '^Architecture: ' ||:)"
+    GOT="$(wget -q -O - "$TRY_MIRROR/dists/$SUITE/main/binary-$ARCH/Release" 2>/dev/null | grep '^Architecture: ' ||:)"
     if [ "$GOT" ]; then
       DEF0_MIRROR="$TRY_MIRROR"
       break
@@ -564,11 +561,11 @@ fi
 info DEF0MIRROR "Using mirror: $DEF0_MIRROR"
 
 if [ ! -e "$SCRIPT" ]; then
-	if [ "${DEF0_MIRROR%/ubuntu*/}" != "$DEF0_MIRROR" ]; then
+	if [ "${DEF0_MIRROR%/ubuntu*}" != "$DEF0_MIRROR" ]; then
 		SCRIPT="${SCRIPT%/*}/gutsy"
-	elif [ "${DEF0_MIRROR%/tanglu*/}" != "$DEF0_MIRROR" ]; then
+	elif [ "${DEF0_MIRROR%/tanglu*}" != "$DEF0_MIRROR" ]; then
 		SCRIPT="${SCRIPT%/*}/aequorea"
-	elif [ "${DEF0_MIRROR%/debian*/}" != "$DEF0_MIRROR" ]; then
+	elif [ "${DEF0_MIRROR%/debian*}" != "$DEF0_MIRROR" ]; then
 		SCRIPT="${SCRIPT%/*}/sid"
 	else
 		warning UNKNOWNDIST "Unknown Linux distribution based on mirror URL: $DEF0_MIRROR"
