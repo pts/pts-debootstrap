@@ -77,7 +77,7 @@ wgetprogress () {
 	[ ! "$VERBOSE" ] && QSWITCH="-q"
 	local ret=0
 	if [ "$USE_DEBIANINSTALLER_INTERACTION" ] && [ "$PROGRESS_NEXT" ]; then
-		wget "$@" 2>&1 >/dev/null | $PKGDETAILS "WGET%" $PROGRESS_NOW $PROGRESS_NEXT $PROGRESS_END >&3
+		wget "$@" 2>&1 >/dev/null | "$PKGDETAILS" "WGET%" $PROGRESS_NOW $PROGRESS_NEXT $PROGRESS_END >&3
 		ret=$?
 	else
 		wget $QSWITCH "$@" 
@@ -686,7 +686,7 @@ get_package_sizes () {
 	# mirror pkgdest debs..
 	local m="$1"; shift
 	local pkgdest="$1"; shift
-	$PKGDETAILS PKGS "$m" "$pkgdest" "$@" | (
+	"$PKGDETAILS" PKGS "$m" "$pkgdest" "$@" | (
 		newleft=""
 		totaldebs=0
 		countdebs=0
@@ -709,7 +709,7 @@ download_debs () {
 	local pkgdest="$2"
 	shift; shift
 
-	$PKGDETAILS PKGS "$m" "$pkgdest" "$@" | (
+	"$PKGDETAILS" PKGS "$m" "$pkgdest" "$@" | (
 		leftover=""
 		while read p ver arc mdup fil checksum size; do
 			if [ "$ver" = "-" ]; then
@@ -828,7 +828,7 @@ download_main () {
 			local path="dists/$SUITE/$c/binary-$ARCH/Packages"
 			local pkgdest="$TARGET/$($DLDEST pkg "$SUITE" "$c" "$ARCH" "$m" "$path")"
 			if [ ! -e "$pkgdest" ]; then continue; fi
-			details="$($PKGDETAILS PKGS "$m" "$pkgdest" "$p")"
+			details="$("$PKGDETAILS" PKGS "$m" "$pkgdest" "$p")"
 			if [ "$details" = "$p -" ]; then
 				details=""
 				continue
@@ -1199,10 +1199,6 @@ setup_merged_usr() {
 		mkdir -p $TARGET/usr/$dir
 	done
 }
-
-################################################################ pkgdetails
-
-PKGDETAILS="$DEBOOTSTRAP_DIR/pkgdetails"
 
 ##################################################### dependency resolution
 

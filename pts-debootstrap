@@ -160,12 +160,6 @@ EOF
 
 ###########################################################################
 
-if [ -z "$PKGDETAILS" ]; then
-	error 1 NO_PKGDETAILS "No pkgdetails available; build pkgdetails.c from the base-installer source package"
-fi
-
-###########################################################################
-
 if [ $# != 0 ] ; then
     while true ; do
 	case "$1" in
