@@ -3,9 +3,6 @@
 # pts-debootstrap: portable debootstrap for i386 and amd64
 # by pts@fazekas.hu at Wed Jul 18 01:42:11 CEST 2018
 #
-# Oldest Debian which works on 2018-07-18: potato (Debian 2.2,  released on 2000-08-15)
-# Oldest Ubuntu which works on 2018-07-18: feisty (Ubuntu 7.04, released on 2007-04-19).
-#
 
 if true; then
 
