@@ -7,6 +7,8 @@
 # Oldest Ubuntu which works on 2018-07-18: feisty (Ubuntu 7.04, released on 2007-04-19).
 #
 
+if true; then
+
 VERSION='1.0.89-pts'
 
 if test -z "$DEBOOTSTRAP_BUSYBOX"; then
@@ -788,4 +790,7 @@ if am_doing_phase kill_target; then
 		info KILLTARGET "Deleting target directory"
 		rm -rf "$TARGET"
 	fi
+fi
+
+exit  # Make the shell script editable while running.
 fi
