@@ -1277,8 +1277,8 @@ check_sane_mount () {
 		;;
 	esac
 
-	SH=/bin/sh
-	[ -x $SH ] || SH=`which sh`
+	SH="$DEBOOTSTRAP_DIR/busybox sh"
+	[ -x "$DEBOOTSTRAP_DIR/busybox" ] || SH="/bin/sh"
 
 	cat > "$1/test-exec" <<EOF
 #! $SH
