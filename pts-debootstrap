@@ -19,36 +19,24 @@ if test -z "$DEBOOTSTRAP_BUSYBOX"; then
   exit 121
 fi
 
-if test -z "$DEBOOTSTRAP_DIR"; then
-  echo "E: $DEBOOTSTRAP_DIR is empty"
-  exit 121
-fi
-if test -h "$DEBOOTSTRAP_DIR"/bin/cat; then
-  :
-else
-  # TODO(pts): Create symlinks as regular users, not as root.
-  "$DEBOOTSTRAP_DIR"/busybox rm -rf   "$DEBOOTSTRAP_DIR"/bin
-  "$DEBOOTSTRAP_DIR"/busybox mkdir -p "$DEBOOTSTRAP_DIR"/bin || exit "$?"
-  for F in $("$DEBOOTSTRAP_DIR"/busybox --list); do
-    "$DEBOOTSTRAP_DIR"/busybox ln -s ../busybox "$DEBOOTSTRAP_DIR/bin/$F" || exit "$?"
-  done
-  "$DEBOOTSTRAP_DIR"/busybox ln -s ../miniar "$DEBOOTSTRAP_DIR"/bin/ar || exit "$?"
-  "$DEBOOTSTRAP_DIR"/busybox ln -s ../pkgdetails "$DEBOOTSTRAP_DIR"/bin/pkgdetails || exit "$?"
-  if ! test -h "$DEBOOTSTRAP_DIR"/bin/cat; then
-    echo "E: cat: command not found for busybox"
+for F in busybox pkgdetails miniar; do
+  if test -f "$DEBOOTSTRAP_DIR/$F" && test -e "$DEBOOTSTRAP_DIR/$F"; then
+    :
+  else
+    echo "E: $F not found: $DEBOOTSTRAP_DIR/$F"
     exit 121
   fi
-fi
-if test "${DEBOOTSTRAP_DIR#/}" = "$DEBOOTSTRAP_DIR"; then
-  # Make it absolute because of some `cd' commends in `functions'.
-  export PATH="$PWD/$DEBOOTSTRAP_DIR/bin"
-else
-  export PATH="$DEBOOTSTRAP_DIR/bin"
-fi
-if test "${PATH#*:}" != "$PATH"; then
-  echo "E: PATH=$PATH contains a colon"
-  exit 121
-fi
+done
+DEBOOTSTRAP_AR="$DEBOOTSTRAP_DIR/miniar"
+PKGDETAILS="$DEBOOTSTRAP_DIR/pkgdetails"
+
+for F in bunzip2 bzcat cat chmod chown chroot cp cut env grep gunzip \
+    head id ln md5sum mkdir mknod mount mv printf readlink rm rmdir \
+    sed sh sleep sort sync tar touch tr umount uname uniq unxz wc \
+    wget xzcat yes zcat sha1sum sha256sum sha512sum; do
+  eval "$F () { \"\$DEBOOTSTRAP_DIR/busybox\" $F \"\$@\"; }"
+done
+export PATH="/dev/null/missing"
 
 # TODO(pts): Always mention $TARGET/debootstrap/debootstrap.log on error exit.
 set -e
@@ -66,8 +54,7 @@ FORCE_KEYRING=""
 VARIANT=""
 MERGED_USR="no"
 ARCH=i386  #ARCH=""   #### pts ####
-HOST_ARCH=""
-HOST_OS=""
+HOST_OS=""  # TODO(pts): Remove non-Linux code.
 KEEP_DEBOOTSTRAP_DIR=""
 USE_DEBIANINSTALLER_INTERACTION=""
 SECOND_STAGE_ONLY=""
