@@ -894,7 +894,7 @@ extract_deb_data () {
 	esac
 
 	if type $cat_cmd >/dev/null 2>&1; then
-		"$DEBOOTSTRAP_AR" -p "$pkg" "$tarball" | $cat_cmd | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+		"$DEBOOTSTRAP_AR" -p "$pkg" "$tarball" | $cat_cmd | tar -xf -
 	else
 		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
 	fi
