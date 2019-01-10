@@ -3,6 +3,12 @@
 # pts-debootstrap: portable debootstrap for i386 and amd64
 # by pts@fazekas.hu at Wed Jul 18 01:42:11 CEST 2018
 #
+# TODO(pts): Omit the warning when configuring packages for slink.
+# TODO(pts): When installing trusty to a trusty host, omit killing processes:
+#            [30898.009903] init: upstart-udev-bridge main process (13467) terminated with status 1
+#            [30898.010287] init: upstart-socket-bridge main process (13472) terminated with status 1
+#            [30898.010625] init: upstart-file-bridge main process (13473) terminated with status 1
+#
 
 if true; then
 
