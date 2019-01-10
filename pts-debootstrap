@@ -59,7 +59,6 @@ SECOND_STAGE_ONLY=""
 PRINT_DEBS=""
 CHROOTDIR=""
 MAKE_TARBALL=""
-EXTRACTOR_OVERRIDE=""
 UNPACK_TARBALL=""
 ADDITIONAL=""
 EXCLUDE=""
@@ -135,7 +134,7 @@ usage()
                                (can be used to create a foreign chroot)
                                (requires --second-stage)
       --extractor=TYPE       override automatic .deb extractor selection
-                               (supported: $EXTRACTORS_SUPPORTED)
+                               (supported: ar)
       --debian-installer     used for internal purposes by debian-installer
       --private-key=file     read the private key from file
       --certificate=file     use the client certificate stored in file (PEM)
@@ -233,22 +232,13 @@ if [ $# != 0 ] ; then
 			error 1 NEEDARG "option requires an argument %s" "$1"
 		fi
 		;;
-	    --extractor|--extractor=?*)
+	    --extractor|--extractor=?*)  # Ignore. Use the built-in extract_deb_* using ar.
 		if [ "$1" = "--extractor" -a -n "$2" ] ; then
-			EXTRACTOR_OVERRIDE="$2"
 			shift 2
 		elif [ "$1" != "${1#--extractor=}" ]; then
-			EXTRACTOR_OVERRIDE="${1#--extractor=}"
 			shift
 		else
 			error 1 NEEDARG "option requires an argument %s" "$1"
-		fi
-		if valid_extractor "$EXTRACTOR_OVERRIDE"; then
-			if ! type "$EXTRACTOR_OVERRIDE" >/dev/null 2>&1; then
-				error 1 MISSINGEXTRACTOR "The selected extractor cannot be found: %s" "$EXTRACTOR_OVERRIDE"
-			fi
-		else
-			error 1 BADEXTRACTOR "%s: unknown extractor" "$EXTRACTOR_OVERRIDE"
 		fi
 		;;
 	    --unpack-tarball|--unpack-tarball=?*)
