@@ -12,42 +12,32 @@
 
 if true; then
 
-VERSION='1.0.89-pts'
+VERSION='1.0.89-pts2'
 
+DEBOOTSTRAP_DIR="${0%/*}"
 if test -z "$DEBOOTSTRAP_BUSYBOX"; then
-  export DEBOOTSTRAP_DIR="${0%/*}"
   test -f "$DEBOOTSTRAP_DIR"/busybox && test -x "$DEBOOTSTRAP_DIR"/busybox &&
-      exec "$DEBOOTSTRAP_DIR"/busybox env -i DEBOOTSTRAP_BUSYBOX=1 DEBOOTSTRAP_DIR="$DEBOOTSTRAP_DIR" PATH=/dev/null/missing "$DEBOOTSTRAP_DIR"/busybox sh "$0" "$@"
+      exec "$DEBOOTSTRAP_DIR"/busybox env -i DEBOOTSTRAP_BUSYBOX=1 "$DEBOOTSTRAP_DIR"/busybox sh "$0" "$@"
   echo "E: $DEBOOTSTRAP_DIR/busybox not found"
   exit 121
 fi
+export PATH=/dev/null/missing
 
-for F in busybox pkgdetails miniar; do
-  if test -f "$DEBOOTSTRAP_DIR/$F" && test -e "$DEBOOTSTRAP_DIR/$F"; then
-    :
-  else
-    echo "E: $F not found: $DEBOOTSTRAP_DIR/$F"
-    exit 121
-  fi
-done
-DEBOOTSTRAP_AR="$DEBOOTSTRAP_DIR/miniar"
-PKGDETAILS="$DEBOOTSTRAP_DIR/pkgdetails"
-
-# Shell builtings: true, false, pwd, printf.
-for F in bunzip2 bzcat cat chmod chown chroot cp cut env grep gunzip \
-    head id ln md5sum mkdir mknod mount mv readlink rm rmdir \
+# Shell builtins: true, false, pwd, printf, [, [[, test, echo, cd, exit,
+# exec.
+for F in ar bunzip2 bzcat cat chmod chown chroot cp cut env grep gunzip \
+    head id ln md5sum mkdir mknod mount mv pkgdetails readlink rm rmdir \
     sed sh sleep sort sync tar touch tr umount uname uniq unxz wc \
     wget xzcat yes zcat sha1sum sha256sum sha512sum; do
   eval "$F () { \"\$DEBOOTSTRAP_DIR/busybox\" $F \"\$@\"; }"
 done
-export PATH="/dev/null/missing"
 
 # TODO(pts): Always mention $TARGET/debootstrap/debootstrap.log on error exit.
 set -e
 
 ###########################################################################
 
-. $DEBOOTSTRAP_DIR/functions
+. "$DEBOOTSTRAP_DIR/functions"
 exec 4>&1
 
 export LANG=C LANGUAGE=C LC_ALL=C
@@ -388,18 +378,18 @@ fi
 ###########################################################################
 
 if [ "$SECOND_STAGE_ONLY" = "true" ]; then
-	SUITE=$(cat $DEBOOTSTRAP_DIR/suite)
-	ARCH=$(cat $DEBOOTSTRAP_DIR/arch)
-	if [ -e $DEBOOTSTRAP_DIR/variant ]; then
-		VARIANT=$(cat $DEBOOTSTRAP_DIR/variant)
+	SUITE=$(cat "$DEBOOTSTRAP_DIR/suite")
+	ARCH=$(cat "$DEBOOTSTRAP_DIR/arch")
+	if [ -e "$DEBOOTSTRAP_DIR/variant" ]; then
+		VARIANT=$(cat "$DEBOOTSTRAP_DIR/variant")
 		SUPPORTED_VARIANTS="$VARIANT"
 	fi
 	if [ -z "$CHROOTDIR" ]; then
 		TARGET=/
 	else
-		TARGET=$CHROOTDIR
+		TARGET="$CHROOTDIR"
 	fi
-	SCRIPT=$DEBOOTSTRAP_DIR/suite-script
+	SCRIPT="$DEBOOTSTRAP_DIR/suite-script"
 else
 	if [ -z "$1" ] || [ -z "$2" ]; then
 		usage_err 1 NEEDSUITETARGET "You must specify a suite and a target."
@@ -647,7 +637,7 @@ if am_doing_phase first_stage; then
 
 	if ! am_doing_phase second_stage; then
 		cp "$0"				 "$TARGET/debootstrap/debootstrap"
-		cp $DEBOOTSTRAP_DIR/functions	 "$TARGET/debootstrap/functions"
+		cp "$DEBOOTSTRAP_DIR/functions"	 "$TARGET/debootstrap/functions"
 		cp $SCRIPT			 "$TARGET/debootstrap/suite-script"
 		echo "$ARCH"			>"$TARGET/debootstrap/arch"
 		echo "$SUITE"			>"$TARGET/debootstrap/suite"
@@ -662,8 +652,8 @@ fi
 
 if am_doing_phase second_stage; then
 	if [ "$SECOND_STAGE_ONLY" = true ]; then
-		required="$(cat $DEBOOTSTRAP_DIR/required)"
-		base="$(cat $DEBOOTSTRAP_DIR/base)"
+		required="$(cat "$DEBOOTSTRAP_DIR/required")"
+		base="$(cat "$DEBOOTSTRAP_DIR/base")"
 		all_debs="$required $base"
 	fi
 
