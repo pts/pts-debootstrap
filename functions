@@ -11,7 +11,7 @@ in_path () {
 	local OLD_IFS="$IFS"
 	IFS=":"
 	for dir in $PATH; do
-		if [ -x "$dir/$1" ]; then
+		if [ -e "$dir/$1" ]; then
 			IFS="$OLD_IFS"
 			return 0
 		fi
