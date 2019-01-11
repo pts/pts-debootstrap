@@ -12,7 +12,7 @@
 
 if true; then
 
-VERSION='1.0.89-pts3'
+VERSION='1.0.89-pts4'
 
 unset F
 if test "${PTS_DEBOOTSTRAP_BUSYBOX%/*}" = "$PTS_DEBOOTSTRAP_BUSYBOX"; then
@@ -32,6 +32,8 @@ if test "${PTS_DEBOOTSTRAP_BUSYBOX%/*}" = "$PTS_DEBOOTSTRAP_BUSYBOX"; then
   exit 121
 fi
 export PTS_DEBOOTSTRAP_BUSYBOX
+unset OLD_PATH
+OLD_PATH="$PATH"
 export PATH=/dev/null/missing  # Don't look for commands in /usr/bin etc.
 unset DEBOOTSTRAP_DIR LANG LANGUAGE LC_CTYPE LC_ALL LD_PRELOAD LD_LIBRARY_PATH
 DEBOOTSTRAP_DIR="${PTS_DEBOOTSTRAP_BUSYBOX%/*}"
@@ -1936,7 +1938,8 @@ if [ "$SECOND_STAGE_ONLY" = "true" ]; then
 	else
 		TARGET="$CHROOTDIR"
 	fi
-	SCRIPT="$DEBOOTSTRAP_DIR/suite-script"
+	SCRIPT=
+	FORCE_SCRIPT="$DEBOOTSTRAP_DIR/suite-script"
 else
 	if [ -z "$1" ] || [ -z "$2" ]; then
 		usage_err 1 NEEDSUITETARGET "You must specify a suite and a target."
@@ -1953,13 +1956,20 @@ else
 		fi
 	fi
 
-	SCRIPT="$DEBOOTSTRAP_DIR/pts-debootstrap.scripts/$1"
-	if [ -n "$VARIANT" ] && [ -e "${SCRIPT}.${VARIANT}" ]; then
-		SCRIPT="${SCRIPT}.${VARIANT}"
-		SUPPORTED_VARIANTS="$VARIANT"
+	SCRIPT="$1"
+	if test "$4"; then
+		FORCE_SCRIPT="$4"
+		SCRIPT=
+	elif test "${1%*/}" != "$1"; then
+		FORCE_SCRIPT="$SCRIPT"
+		SCRIPT=
+	else
+		FORCE_SCRIPT=
 	fi
-	if [ "$4" != "" ]; then
-		SCRIPT="$4"
+	if test "$FORCE_SCRIPT"; then
+		test -e "$FORCE_SCRIPT" || error 1 NOSCRIPT "No such script: %s" "$FORCE_SCRIPT"
+	elif test -z "$SCRIPT"; then
+		error 1 EMPTYSCRIPT "Empty script value specified."
 	fi
 fi
 
@@ -2020,26 +2030,59 @@ else
   done
   unset TRY_MIRROR GOT
   #echo "SCRIPT=$SCRIPT" >&4
+  #echo "FORCE_SCRIPT=$FORCE_SCRIPT" >&4
   #echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
 fi
 info DEF0MIRROR "Using mirror: $DEF0_MIRROR"
 
-if [ ! -e "$SCRIPT" ]; then
+get_script_by_mirror () {
 	if [ "${DEF0_MIRROR%/ubuntu*}" != "$DEF0_MIRROR" ]; then
-		SCRIPT="${SCRIPT%/*}/gutsy"
+		SCRIPT="gutsy"
 	elif [ "${DEF0_MIRROR%/tanglu*}" != "$DEF0_MIRROR" ]; then
-		SCRIPT="${SCRIPT%/*}/aequorea"
+		SCRIPT="aequorea"
 	elif [ "${DEF0_MIRROR%/debian*}" != "$DEF0_MIRROR" ]; then
-		SCRIPT="${SCRIPT%/*}/sid"
+		SCRIPT="sid"
 	else
-		warning UNKNOWNDIST "Unknown Linux distribution based on mirror URL: $DEF0_MIRROR"
+		warning UNKNOWNDIST "Unknown Linux distribution based on mirror URL: %s" "$DEF0_MIRROR"
+	fi
+}
+
+download_script () {
+	SCRIPT_URL="$BASE_URL/pts-debootstrap.scripts/$SCRIPT"
+	info SCRIPTDOWNLOAD "Downloading script: $SCRIPT_URL"
+	# TODO(pts): Restore $LD_LIBRARY_PATH etc.
+	set +e
+	:
+	SCRIPT="$(PATH="$OLD_PATH" command $DOWNLOAD "$SCRIPT_URL")"
+	test $? = 0 || SCRIPT=""
+	set -e
+}
+
+if test -z "$FORCE_SCRIPT"; then
+	# $BASE_URL and $DOWNLOAD were set up by the pts_debootstrap_cmd in the pts-debootstrap busybox executable.
+        if test "$BASE_URL" && test "$DOWNLOAD"; then
+		download_script
+		if test -z "$SCRIPT"; then
+			get_script_by_mirror
+			download_script
+			if test -z "$SCRIPT"; then
+				error 1 NOSCRIPTDOWNLOAD "E: script download failed: %s" "$SCRIPT_URL"
+			fi
+		fi
+	elif test -d "$DEBOOTSTRAP_DIR/pts-debootstrap.scripts"; then
+		FORCE_SCRIPT="$DEBOOTSTRAP_DIR/pts-debootstrap.scripts/$SCRIPT"
+		if ! test -e "$FORCE_SCRIPT"; then
+			get_script_by_mirror
+			FORCE_SCRIPT="$DEBOOTSTRAP_DIR/pts-debootstrap.scripts/$SCRIPT"
+			test -e "$FORCE_SCRIPT" || error 1 NOSCRIPT "No such script: %s" "$FORCE_SCRIPT"
+		fi
+		SCRIPT=
+	else
+		error 1 NOSCRIPTDIR "Script directory missing: %s" "$DEBOOTSTRAP_DIR/pts-debootstrap.scripts"
 	fi
 fi
-#echo "SCRIPT=$SCRIPT" >&4
-#echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
-if [ ! -e "$SCRIPT" ]; then
-	error 1 NOSCRIPT "No such script: %s" "$SCRIPT"
-fi
+
+#echo "SCRIPT=($SCRIPT)" >&4; echo "FORCE_SCRIPT=($FORCE_SCRIPT)" >&4; exit
 
 ###########################################################################
 
@@ -2090,7 +2133,11 @@ fi
 
 ###########################################################################
 
-. "$SCRIPT"
+if test "$FORCE_SCRIPT"; then
+	. "$FORCE_SCRIPT"
+else
+	eval "$SCRIPT"
+fi
 DEF_MIRROR="$DEF0_MIRROR"
 DEF_HTTPS_MIRROR="https://${DEF0_MIRROR#*://}"
 unset DEF0_MIRROR
@@ -2184,8 +2231,13 @@ if am_doing_phase first_stage; then
 
 	if ! am_doing_phase second_stage; then
 		cp "$0"				 "$TARGET/debootstrap/debootstrap"
-		cp "$DEBOOTSTRAP_DIR/functions"	 "$TARGET/debootstrap/functions"
-		cp $SCRIPT			 "$TARGET/debootstrap/suite-script"
+		cp -- "$DEBOOTSTRAP_DIR/functions"	 "$TARGET/debootstrap/functions"
+		if test "$FORCE_SCRIPT"; then
+			cp -- "$FORCE_SCRIPT"			 "$TARGET/debootstrap/suite-script"
+		else
+			echo -n "$SCRIPT" >"$TARGET/debootstrap/suite-script"
+		fi
+		chmod 755 "$TARGET/debootstrap/suite-script"
 		echo "$ARCH"			>"$TARGET/debootstrap/arch"
 		echo "$SUITE"			>"$TARGET/debootstrap/suite"
 		[ "" = "$VARIANT" ] ||
