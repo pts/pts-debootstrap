@@ -20,8 +20,11 @@ if test "${PTS_DEBOOTSTRAP_BUSYBOX%/*}" = "$PTS_DEBOOTSTRAP_BUSYBOX"; then
   F="$0"
   test "${0#*/}" = "$0" && F="$(IFS=":"; for D in $PATH; do if test -e "$D/$0"; then echo "$D/$0"; exit; fi; done)"
   if test "$F" && test -f "$F"; then
-    export PTS_DEBOOTSTRAP_BUSYBOX
     PTS_DEBOOTSTRAP_BUSYBOX="${F%/*}"/busybox.pts-debootstrap
+    export PTS_DEBOOTSTRAP_BUSYBOX
+    test -f "$PTS_DEBOOTSTRAP_BUSYBOX" && test -x "$PTS_DEBOOTSTRAP_BUSYBOX" &&
+        exec "$PTS_DEBOOTSTRAP_BUSYBOX" sh "$F" "$@"
+    PTS_DEBOOTSTRAP_BUSYBOX="${F%/*}"/pts-debootstrap
     test -f "$PTS_DEBOOTSTRAP_BUSYBOX" && test -x "$PTS_DEBOOTSTRAP_BUSYBOX" &&
         exec "$PTS_DEBOOTSTRAP_BUSYBOX" sh "$F" "$@"
   fi
