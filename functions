@@ -1255,8 +1255,8 @@ check_sane_mount () {
 		;;
 	esac
 
-	SH="$DEBOOTSTRAP_DIR/busybox sh"
-	[ -x "$DEBOOTSTRAP_DIR/busybox" ] || SH="/bin/sh"
+	SH="$PTS_DEBOOTSTRAP_BUSYBOX sh"
+	[ -x "$PTS_DEBOOTSTRAP_BUSYBOX" ] || SH="/bin/sh"
 
 	cat > "$1/test-exec" <<EOF
 #! $SH
