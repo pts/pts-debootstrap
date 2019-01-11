@@ -31,6 +31,10 @@ if test "${PTS_DEBOOTSTRAP_BUSYBOX%/*}" = "$PTS_DEBOOTSTRAP_BUSYBOX"; then
   echo "E: busybox not found in: $0"
   exit 121
 fi
+# Some operations below change the current directory, so we make
+# $PTS_DEBOOTSTRAP_BUSYBOX absolute.
+test "${PTS_DEBOOTSTRAP_BUSYBOX#/}" = "$PTS_DEBOOTSTRAP_BUSYBOX" &&
+	PTS_DEBOOTSTRAP_BUSYBOX="$PWD/$PTS_DEBOOTSTRAP_BUSYBOX"
 export PTS_DEBOOTSTRAP_BUSYBOX
 unset OLD_PATH
 OLD_PATH="$PATH"
@@ -2230,6 +2234,7 @@ if am_doing_phase first_stage; then
 	first_stage_install
 
 	if ! am_doing_phase second_stage; then
+		# TODO(pts): Fix this ($0).
 		cp "$0"				 "$TARGET/debootstrap/debootstrap"
 		cp -- "$DEBOOTSTRAP_DIR/functions"	 "$TARGET/debootstrap/functions"
 		if test "$FORCE_SCRIPT"; then
