@@ -21,18 +21,26 @@ Features of pts-debootstrap:
 
 Installation to any directory, as a regular user:
 
-  $ rm -f pts-debootstrap-latest.sfx.7z
-  $ wget http://pts.50.hu/files/pts-debootstrap/pts-debootstrap-latest.sfx.7z
-  $ chmod u+x pts-debootstrap-latest.sfx.7z
-  $ ./pts-debootstrap-latest.sfx.7z -y  # Created directory pts-debootstrap
-  $ pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap --help
+  $ rm -f pts-debootstrap
+  $ wget https://raw.githubusercontent.com/pts/pts-debootstrap/master/pts-debootstrap
+  $ chmod u+x pts-debootstrap
+  $ ./pts-debootstrap --help
+
+Please note that by downloading only the pts-debootstrap executable above,
+it will download pts-debootstrap.sh (and also the distribution suite script
+file) from GitHub for each invocation. If you don't want that, you can check
+out the repo, and run it from there:
+
+  $ git clone https://github.com/pts/pts-debootstrap
+  $ cd pts-debootstrap
+  $ ./pts-debootstrap --help
 
 Usage for creating a chroot with the oldest supported Debian (slink,
 Debian 2.1, released on 1999-03-09), i386:
 
-  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap slink slink_dir
+  $ sudo ./pts-debootstrap slink slink_dir
   ...
-  $ sudo pts-debootstrap/bin/chroot slink_dir
+  $ sudo ./pts-debootstrap busybox chroot slink_dir
 
 Please note that in slink (Debian 2.1) and potato (Debian 2.2), UIDs larger
 than 65535 are not supported by the glibc. The oldest Debian which works
@@ -45,15 +53,15 @@ install script has never been written for them.
 Usage for creating a chroot with the oldest supported Ubuntu (breezy,
 Ubuntu 5.10, released on 2005-10-12), i386:
 
-  $ sudo pts-debootstrap/bin/sh pts-debootstrap/pts-debootstrap breezy breezy_dir
+  $ sudo ./pts-debootstrap breezy breezy_dir
   ...
-  $ sudo pts-debootstrap/bin/chroot breezy_dir
+  $ sudo ./pts-debootstrap busybox chroot breezy_dir
 
 To start intalling packages, run `apt-get update' in the chroot first.
 Example:
 
-  $ sudo pts-debootstrap/bin/chroot breezy_dir apt-get update
-  $ sudo pts-debootstrap/bin/chroot breezy_dir apt-get install gcc
+  $ sudo ./pts-debootstrap busybox chroot breezy_dir apt-get update
+  $ sudo ./pts-debootstrap busybox chroot breezy_dir apt-get install gcc
 
 Earlier versions of Ubuntu (such as hoary, Ubuntu 5.04 and warty, Ubuntu
 4.10) don't work because they have glibc version 2.3.2, which is

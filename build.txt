@@ -1,6 +1,0 @@
-
-# TODO(pts): Exclude *~ and Git source files.
-# TODO(pts): Create bin with normal user first (rm -rf bin; ./pts-debootstrap --version)
-time 7z a -sfx../../../../../../../../"$PWD"/tiny7zx -t7z -mx=7 -ms=32m -ms=on pts-debootstrap-latest.sfx.7z pts-debootstrap
-
-__END__
