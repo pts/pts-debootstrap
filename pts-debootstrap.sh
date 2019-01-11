@@ -1953,7 +1953,7 @@ else
 		fi
 	fi
 
-	SCRIPT="$DEBOOTSTRAP_DIR/scripts/$1"
+	SCRIPT="$DEBOOTSTRAP_DIR/pts-debootstrap.scripts/$1"
 	if [ -n "$VARIANT" ] && [ -e "${SCRIPT}.${VARIANT}" ]; then
 		SCRIPT="${SCRIPT}.${VARIANT}"
 		SUPPORTED_VARIANTS="$VARIANT"
