@@ -1,2 +1,7 @@
 *~
 /bin
+/busybox-1.21.1.tar.bz2
+/pts-xstatic-latest.sfx.7z
+/busybox.pts-debootstrap
+/busybox.pts-debootstrap.unstripped
+/busybox.big
