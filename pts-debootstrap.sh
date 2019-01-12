@@ -1,7 +1,31 @@
 #!/bin/sh
 #
-# pts-debootstrap: portable debootstrap for i386 and amd64
+# pts-debootstrap.sh: portable debootstrap for i386 and amd64
 # by pts@fazekas.hu at Wed Jul 18 01:42:11 CEST 2018
+#
+# If you've checked out the entire repo, you can run this script directly:
+#
+#   $ sudo ./pts-debootstrap.sh slink slink_dir
+#
+# It also works without the .sh:
+#
+#   $ sudo ./pts-debootstrap    slink slink_dir
+#
+# However, you don't need to check out the repo to run this script:
+#
+#   $ rm -f pts-debootstrap
+#   $ wget https://raw.githubusercontent.com/pts/pts-debootstrap/master/pts-debootstrap
+#   $ chmod u+x pts-debootstrap
+#   $ sudo ./pts-debootstrap    slink slink_dir
+#
+# In this case this script will be downloaded from GitHub by pts-deboostrap.
+#
+# This script is a shell script which can be run by bash, zsh, dash, pdksh,
+# mksh and busybox sh. However, in the first big `if' it locates a busybox
+# sh named pts-debootstrap, and (re)runs itself with that busybox sh. For
+# external commands (e.g. cp, wget, chroot) it also uses the applets built in
+# to the busybox named pts-debootstrap. For compiling pts-deboostrap, see
+# compile_busybox.sh.
 #
 # TODO(pts): Omit the warning when configuring packages for slink.
 # TODO(pts): When installing trusty to a trusty host, omit killing processes:
