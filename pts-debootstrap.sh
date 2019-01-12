@@ -34,7 +34,6 @@
 #            [30898.010625] init: upstart-file-bridge main process (13473) terminated with status 1
 #
 
-if true; then
 
 VERSION='1.0.89-pts4'
 
@@ -55,6 +54,10 @@ if test "${PTS_DEBOOTSTRAP_BUSYBOX%/*}" = "$PTS_DEBOOTSTRAP_BUSYBOX"; then
   echo "E: busybox not found in: $0"
   exit 121
 fi
+
+# From this point on thus script has `busybox sh' syntax.
+if true; then
+
 # Some operations below change the current directory, so we make
 # $PTS_DEBOOTSTRAP_BUSYBOX absolute.
 test "${PTS_DEBOOTSTRAP_BUSYBOX#/}" = "$PTS_DEBOOTSTRAP_BUSYBOX" &&
