@@ -3,6 +3,12 @@
 # compile_busybox.sh: Compile busybox for pts-debootstrap.
 # by pts@fazekas.hu at Sat Jan 12 01:07:41 CET 2019
 #
+# To run this script, you need and Linux i386 or amd64 system with gcc, make
+# and patch. The recommended system is an Ubuntu Trusty (14.04) with the
+# following packages installed: 
+#
+#   $ sudo apt-get install wget tar bzip2 gcc-4.8 make patch perl
+#
 # Output file is busybox.pts-debootstrap, which should be renamed to
 # pts-debootstrap as part of the release.
 #
