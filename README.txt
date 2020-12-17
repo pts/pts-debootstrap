@@ -46,8 +46,8 @@ Please note that in slink (Debian 2.1) and potato (Debian 2.2), UIDs larger
 than 65535 are not supported by the glibc. The oldest Debian which works
 with UIDs larger than 65535 is woody (Debian 3.0).
 
-Earlier versions of Debian (such as hamm, Debian 2.0 and bo, Debian 1.3 and
-rex, Debian 1.2 and Buzz, Debian 1.1) don't work, because a debootstrap
+Earlier versions of Debian (such as hamm (Debian 2.0) and bo (Debian 1.3) and
+rex (Debian 1.2) and buzz (Debian 1.1) don't work, because a debootstrap
 install script has never been written for them.
 
 Usage for creating a chroot with the oldest supported Ubuntu (breezy,
@@ -57,14 +57,24 @@ Ubuntu 5.10, released on 2005-10-12), i386:
   ...
   $ sudo ./pts-debootstrap busybox chroot breezy_dir
 
+The default target architecture for pts-debootstrap is i386. Specify
+`--arch amd64' to get amd64 (x86_64). (Other architectures don't work
+out-of-the-box, because debootstrap runs code both inside and outside the
+chroot.) The oldest version of Debian on amd64 is etch (Debian 4.0), and the
+oldest supported version of Ubuntu on amd64 is breezy (Ubuntu 5.10).
+
+  $ sudo ./pts-debootstrap --arch amd64 etch etch_dir
+
+  $ sudo ./pts-debootstrap --arch amd64 breezy breezy_dir
+
 To start intalling packages, run `apt-get update' in the chroot first.
 Example:
 
   $ sudo ./pts-debootstrap busybox chroot breezy_dir apt-get update
   $ sudo ./pts-debootstrap busybox chroot breezy_dir apt-get install gcc
 
-Earlier versions of Ubuntu (such as hoary, Ubuntu 5.04 and warty, Ubuntu
-4.10) don't work because they have glibc version 2.3.2, which is
+Earlier versions of Ubuntu (such as hoary (Ubuntu 5.04) and warty (Ubuntu
+4.10)) don't work because they have glibc version 2.3.2, which is
 incompatible with the modern Linux vdso (which cannot be disabled on modern
 Linux systems), and they report the following error in .../debootstrap.log:
 
