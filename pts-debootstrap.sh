@@ -2047,6 +2047,7 @@ if test "$USER_MIRROR"; then
 else
   DEF0_MIRROR=
   for TRY_MIRROR in \
+      http://ftp.debian.org/debian \
       http://archive.debian.org/debian \
       http://archive.ubuntu.com/ubuntu \
       http://old-releases.ubuntu.com/ubuntu \
