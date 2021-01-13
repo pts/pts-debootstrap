@@ -42,6 +42,10 @@ Debian 2.1, released on 1999-03-09), i386:
   ...
   $ sudo ./pts-debootstrap busybox chroot slink_dir
 
+Alternatively, you may specify the suite as debian/slink or debian/2.1
+instead of debian/slink. The list of releases (e.g. 2.1) are hardcoded for
+Debian, Ubuntu and Tanglu.
+
 Please note that in slink (Debian 2.1) and potato (Debian 2.2), UIDs larger
 than 65535 are not supported by the glibc. The oldest Debian which works
 with UIDs larger than 65535 is woody (Debian 3.0).

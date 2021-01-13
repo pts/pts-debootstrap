@@ -2044,22 +2044,86 @@ fi
 ###########################################################################
 
 # Set $DEF0_MIRROR by trying various distributions.
+SUITE0="$SUITE"
 if test "$USER_MIRROR"; then
   DEF0_MIRROR="$USER_MIRROR"
 else
-  SUITE0="$SUITE"
   DEBIAN_MIRRORS='http://ftp.debian.org/debian http://archive.debian.org/debian'
   UBUNTU_MIRRORS='http://archive.ubuntu.com/ubuntu http://old-releases.ubuntu.com/ubuntu http://ports.ubuntu.com/ubuntu-ports'
   TANGLU_MIRRORS='http://archive.tanglu.org/tanglu'
   if test "${SUITE#debian/}" != "$SUITE"; then
     SUITE="${SUITE#*/}"; TRY_MIRRORS="$DEBIAN_MIRRORS"
+    case "$SUITE" in  # From https://en.wikipedia.org/wiki/Debian_version_history#Release_table
+     1.1) SUITE=buzz ;;  # Doesn't work with debootstrap.
+     1.2) SUITE=rex ;;  # Doesn't work with debootstrap.
+     1.3) SUITE=bo ;;  # Doesn't work with debootstrap.
+     2.0) SUITE=hamm ;;  # Doesn't work with debootstrap.
+     2.1) SUITE=slink ;;
+     2.2) SUITE=potato ;;
+     3.0 | 3) SUITE=woody ;;
+     3.1) SUITE=sarge ;;
+     4.0 | 4) SUITE=etch ;;
+     5.0 | 5) SUITE=lenny ;;
+     6.0 | 6) SUITE=squeeze ;;
+     7) SUITE=wheezy ;;
+     8) SUITE=jessie ;;
+     9) SUITE=stretch ;;
+     10) SUITE=buster ;;
+     11) SUITE=bullseye ;;
+     12) SUITE=bookworm ;;
+     13) SUITE=trixie ;;
+    esac
   elif test "${SUITE#ubuntu/}" != "$SUITE"; then
     SUITE="${SUITE#*/}"; TRY_MIRRORS="$UBUNTU_MIRRORS"
+    case "$SUITE" in  # From https://wiki.ubuntu.com/Releases
+     4.10) SUITE=warty ;;  # Doesn't work with debootstrap.
+     5.04) SUITE=hoary ;;  # Doesn't work with debootstrap.
+     5.10) SUITE=breezy ;;
+     6.06) SUITE=dapper ;;
+     6.10) SUITE=edgy ;;
+     7.04) SUITE=feisty ;;
+     7.10) SUITE=gutsy ;;
+     8.04) SUITE=hardy ;;
+     8.10) SUITE=intrepid ;;
+     9.04) SUITE=jaunty ;;
+     9.10) SUITE=karmic ;;
+     10.04) SUITE=lucid ;;
+     10.10) SUITE=maverick ;;
+     11.04) SUITE=natty ;;
+     11.10) SUITE=oneiric ;;
+     12.04) SUITE=precise ;;
+     12.10) SUITE=quantal ;;
+     13.04) SUITE=raring ;;
+     13.10) SUITE=saucy ;;
+     14.04) SUITE=trusty ;;
+     14.10) SUITE=utopic ;;
+     15.04) SUITE=vivid ;;
+     15.10) SUITE=wily ;;
+     16.04) SUITE=xenial ;;
+     16.10) SUITE=yakkety ;;
+     17.04) SUITE=zesty ;;
+     17.10) SUITE=artful ;;
+     18.04) SUITE=bionic ;;
+     18.10) SUITE=cosmic ;;
+     19.04) SUITE=disco ;;
+     19.10) SUITE=eoan ;;
+     20.04) SUITE=focal ;;
+     20.10) SUITE=groovy ;;
+     21.04) SUITE=hirsute ;;
+     21.10) SUITE=ii ;;
+    esac
   elif test "${SUITE#tanglu/}" != "$SUITE"; then
     SUITE="${SUITE#*/}"; TRY_MIRRORS="$TANGLU_MIRRORS"
+    case "$SUITE" in
+     1.0 | 1) SUITE=aequorea ;;  # 2014-04-22.
+     2.0 | 2) SUITE=bartholomea ;; # 2014-12-13.
+     3.0 | 3) SUITE=chromodoris ;;  # 2015-08-05.
+     4.0 | 4) SUITE=dasyatis ;;  # 2017-06-11.
+    esac
   else
     TRY_MIRRORS="$DEBIAN_MIRRORS $UBUNTU_MIRRORS $TANGLU_MIRRORS"
   fi
+  test "$SCRIPT" = "$SUITE0" && SCRIPT="$SUITE"
   DEF0_MIRROR=
   for TRY_MIRROR in $TRY_MIRRORS; do
     GOT="$(wget -q -O - "$TRY_MIRROR/dists/$SUITE/main/binary-$ARCH/Release" 2>/dev/null | grep '^Architecture: ' ||:)"
@@ -2073,10 +2137,11 @@ else
   #echo "FORCE_SCRIPT=$FORCE_SCRIPT" >&4
   #echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
 fi
+info DEFSUITE "Using suite %s and trying script %s" "$SUITE" "$SCRIPT"
 if test "$DEF0_MIRROR"; then
   info DEF0MIRROR "Using mirror: %s" "$DEF0_MIRROR"
 else
-  error 1 DEF0MIRRORW "Mirror not found, maybe unknown suite %s or unsupported architecture %s" "$SUITE" "$ARCH"
+  error 1 DEF0MIRRORW "Mirror not found, maybe unknown suite %s or unsupported architecture %s" "$SUITE0" "$ARCH"
 fi
 
 get_script_by_mirror () {
