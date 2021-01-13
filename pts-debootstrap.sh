@@ -2047,15 +2047,21 @@ fi
 if test "$USER_MIRROR"; then
   DEF0_MIRROR="$USER_MIRROR"
 else
+  SUITE0="$SUITE"
+  DEBIAN_MIRRORS='http://ftp.debian.org/debian http://archive.debian.org/debian'
+  UBUNTU_MIRRORS='http://archive.ubuntu.com/ubuntu http://old-releases.ubuntu.com/ubuntu http://ports.ubuntu.com/ubuntu-ports'
+  TANGLU_MIRRORS='http://archive.tanglu.org/tanglu'
+  if test "${SUITE#debian/}" != "$SUITE"; then
+    SUITE="${SUITE#*/}"; TRY_MIRRORS="$DEBIAN_MIRRORS"
+  elif test "${SUITE#ubuntu/}" != "$SUITE"; then
+    SUITE="${SUITE#*/}"; TRY_MIRRORS="$UBUNTU_MIRRORS"
+  elif test "${SUITE#tanglu/}" != "$SUITE"; then
+    SUITE="${SUITE#*/}"; TRY_MIRRORS="$TANGLU_MIRRORS"
+  else
+    TRY_MIRRORS="$DEBIAN_MIRRORS $UBUNTU_MIRRORS $TANGLU_MIRRORS"
+  fi
   DEF0_MIRROR=
-  for TRY_MIRROR in \
-      http://ftp.debian.org/debian \
-      http://archive.debian.org/debian \
-      http://archive.ubuntu.com/ubuntu \
-      http://old-releases.ubuntu.com/ubuntu \
-      http://ports.ubuntu.com/ubuntu-ports \
-      http://archive.tanglu.org/tanglu \
-  ; do
+  for TRY_MIRROR in $TRY_MIRRORS; do
     GOT="$(wget -q -O - "$TRY_MIRROR/dists/$SUITE/main/binary-$ARCH/Release" 2>/dev/null | grep '^Architecture: ' ||:)"
     if [ "$GOT" ]; then
       DEF0_MIRROR="$TRY_MIRROR"
