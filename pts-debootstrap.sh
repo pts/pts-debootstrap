@@ -2067,9 +2067,14 @@ else
   #echo "FORCE_SCRIPT=$FORCE_SCRIPT" >&4
   #echo "DEF0_MIRROR=$DEF0_MIRROR" >&4
 fi
-info DEF0MIRROR "Using mirror: $DEF0_MIRROR"
+if test "$DEF0_MIRROR"; then
+  info DEF0MIRROR "Using mirror: %s" "$DEF0_MIRROR"
+else
+  error 1 DEF0MIRRORW "Mirror not found, maybe unknown suite %s or unsupported architecture %s" "$SUITE" "$ARCH"
+fi
 
 get_script_by_mirror () {
+	if ! test "$DEF0_MIRROR"; then return; fi
 	if [ "${DEF0_MIRROR%/ubuntu*}" != "$DEF0_MIRROR" ]; then
 		SCRIPT="gutsy"
 	elif [ "${DEF0_MIRROR%/tanglu*}" != "$DEF0_MIRROR" ]; then
@@ -2100,7 +2105,7 @@ if test -z "$FORCE_SCRIPT"; then
 			get_script_by_mirror
 			download_script
 			if test -z "$SCRIPT"; then
-				error 1 NOSCRIPTDOWNLOAD "E: script download failed: %s" "$SCRIPT_URL"
+				error 1 NOSCRIPTDOWNLOAD "E: Script download failed, maybe unknown suite %s: %s" "$SUITE" "$SCRIPT_URL"
 			fi
 		fi
 	elif test -d "$DEBOOTSTRAP_DIR/pts-debootstrap.scripts"; then
@@ -2108,7 +2113,7 @@ if test -z "$FORCE_SCRIPT"; then
 		if ! test -e "$FORCE_SCRIPT"; then
 			get_script_by_mirror
 			FORCE_SCRIPT="$DEBOOTSTRAP_DIR/pts-debootstrap.scripts/$SCRIPT"
-			test -e "$FORCE_SCRIPT" || error 1 NOSCRIPT "No such script: %s" "$FORCE_SCRIPT"
+			test -e "$FORCE_SCRIPT" || error 1 NOSCRIPT "No such script, maybe unknown suite %s: %s" "$SUITE" "$FORCE_SCRIPT"
 		fi
 		SCRIPT=
 	else
