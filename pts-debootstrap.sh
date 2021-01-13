@@ -1979,13 +1979,15 @@ else
 	TARGET="$2"
 	USER_MIRROR="$3"
 	TARGET="${TARGET%/}"
+	TARGET0="$TARGET"
 	if [ "${TARGET#/}" = "${TARGET}" ]; then
 		if [ "${TARGET%/*}" = "$TARGET" ] ; then
 			TARGET="$(echo "`pwd`/$TARGET")"
 		else
-			TARGET="$(cd "${TARGET%/*}"; echo "`pwd`/${TARGET##*/}")"
+			TARGET="$(cd "${TARGET%/*}" 2>/dev/null && echo "`pwd`/${TARGET##*/}" ||:)"
 		fi
 	fi
+	test -d "${TARGET%/*}" || error 1 MISSINGTARGETP "Missing target parent directory: %s" "${TARGET0%/*}"
 
 	SCRIPT="$1"
 	if test "$4"; then
